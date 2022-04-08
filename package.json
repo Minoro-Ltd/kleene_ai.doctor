@@ -1,0 +1,11 @@
+{
+  "name": "kleene_ai.doctor",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.18.0"
+  },
+  "dependencies": {
+    "@tryfabric/martian": "^1.2.0"
+  }
+}

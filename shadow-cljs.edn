@@ -1,0 +1,15 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[cljs-node-io "1.1.2"]
+  [funcool/promesa "8.0.450"]]
+
+ :builds
+ {:app {:main kleene-ai.doctor.core/main
+        :target :node-script
+        :compiler-options {:infer-externs true}
+        :output-to "target/kleene_ai-doctor.js"}}}
