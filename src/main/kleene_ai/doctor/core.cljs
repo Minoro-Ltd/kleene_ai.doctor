@@ -3,13 +3,11 @@
             [cljs-node-io.core :as io]
             [clojure.string :as str]
             [promesa.core :as p]
-            ["fs" :as fs]))
+            ["fs" :as fs]
+            ["@actions/core" :as actions.core]))
 
-(def token "")
-
-(def notion-version "2022-02-22")
-
-
+(def token (actions.core/getInput "token"))
+(def notion-version (actions.core/getInput "notion-version"))
 (def headers {:Content-Type "application/json"
                :Authorization token
                :Notion-Version notion-version})
@@ -17,6 +15,8 @@
 (defn json-str->clj [s]
   (-> (js/JSON.parse s)
       js->clj))
+
+
 
 
 (defn fetch [url options]
@@ -48,8 +48,11 @@
 
 
 (defn extract-title [m]
-  (get-in m ["properties" "title" "title" 0  "plain_text"]))
+  (get-in m ["properties" "title" "title" 0 "plain_text"]))
 
+
+;;TODO add a parent-id parameter to make it so it finds things within that parent,
+;;     also use pagination
 
 (defn get-page-data [name]
   (p/let [body (js/JSON.stringify (clj->js {:query (str name)
@@ -77,7 +80,7 @@
 
 
 
-;; make this use pagination using iteration :)
+;; make this use pagination using iteration and add page_size=100 as a query param  :)
 
 (defn get-all-block-ids [page-id]
   (p/let [response (fetch (str "https://api.notion.com/v1/blocks/" page-id "/children")
@@ -127,6 +130,13 @@
    :parent {:type "page_id", :page_id parent-id},
    :children content})
 
+;; markdownToBlocks ruins code field colors, so if possible we should do some
+;; post-processing on the blocks that come out to fix that (we just have to
+;; dissoc the "color" key from blocks with code type)
+
+;;also images have to be hosted somewhere because inline doesn't work,
+;;but maybe if we put them in s3? (and automate that)
+
 
 (defn create-page! [parent-id title md-content]
   (p/let [content (markdownToBlocks md-content)
@@ -159,6 +169,7 @@
        (filter #(.isDirectory %))
        (map #(.-name %))))
 
+;; I think this fails if there are 2 files with the same name, regardless of directory
 
 (defn create-or-update-page! [parent-id path filename]
   (p/let [title (first (str/split filename #"\."))
@@ -179,28 +190,29 @@
 
 
 (defn create-all-in-dir! [parent-id path]
-  (p/let [_ (prn parent-id path)
-          files (get-all-files path)
+  (p/let [files (get-all-files path)
           file-results (p/all (mapv #(create-or-update-page! parent-id path %) files))
           directories (get-all-dirs path)
-          dir-results(p/all (mapv #(create-or-update-directory! parent-id %) directories))
-          _ (prn dir-results)]
+          dir-results (p/all (mapv #(create-or-update-directory! parent-id %) directories))]
+
     (if (not-empty directories)
       (p/run! (fn [{:keys [title id]}] (create-all-in-dir! id (str path "/" title))) dir-results)
       (prn (str "done with: " path)))))
 
 
 (defn main [& args]
-  )
+  (let [doc-path (or (actions.core/getInput "doc-path") "docs")
+        root-id (actions.core/getInput "root-id")]
+    (create-all-in-dir! root-id doc-path)))
 
 
 (comment
   (.then (create-all-in-dir! doctor-id "docs") #(prn "done"))
 
+  (js/JSON.stringify (markdownToBlocks (io/slurp "docs/ExampleProj2/Block Types.md")))
+  (def doctor-id "c24123b2dd7f41d39d88c78e029eb18a")
 
-  (def doctor-id "")
-
-  (create-or-update-page doctor-id "Example1" "docs/ExampleProj2/README.md")
+  (create-or-update-page! doctor-id "docs/ExampleProj2" "Block Types.md")
 
   (p/let [page-data (get-page-data "DocTor")
           {:keys [id]} page-data
@@ -216,6 +228,7 @@
   (io/file-seq "docs")
 
   (io/slurp "docs")
+
 
   (js/JSON.stringify
    (markdownToBlocks ex))

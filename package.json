@@ -6,6 +6,7 @@
     "shadow-cljs": "2.18.0"
   },
   "dependencies": {
+    "@actions/core": "^1.8.2",
     "@tryfabric/martian": "^1.2.0"
   }
 }

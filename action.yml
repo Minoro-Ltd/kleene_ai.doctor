@@ -1,0 +1,20 @@
+name: 'Doctor'
+description: 'sync your local docs to notion'
+inputs:
+  token:
+    description: 'Your Notion App token'
+    required: true
+  notion-version:
+    description: 'what version your notion requires you to use'
+    required: true
+    default: '2022-02-22'
+  root-id:
+    description: 'id of the document under which all files will be synced'
+    required: true
+  doc-path:
+    description: 'path to the doc folder you want to sync, from the root of the project'
+    required: true
+    defualt: 'docs'
+runs:
+  using: 'node16'
+  main: 'target/kleene_ai-doctor.js'
