@@ -14,7 +14,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Sync Docs
-      uses: Minoro-Ltd/kleene_ai.doctor@v0.0.1-alpha2
+      uses: Minoro-Ltd/kleene_ai.doctor@v0.0.1-alpha3
       with:
         token: ${{secrets.TOKEN}}
         notion-version: '2022-02-22'
