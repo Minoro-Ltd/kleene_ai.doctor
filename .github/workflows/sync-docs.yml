@@ -1,0 +1,22 @@
+name: "Sync Docs"
+on:
+  pull_request_target:
+    branches:
+      - "master"
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Sync Docs
+      uses: Minoro-Ltd/kleene_ai.doctor@v0.0.1-alpha
+      with:
+        token: ${{secrets.TOKEN}}
+        notion-version: '2022-02-22'
+        root-id: ${{secrets.ROOT_ID}}
+        doc-path: "docs"
