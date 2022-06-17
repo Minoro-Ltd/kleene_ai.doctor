@@ -1,4 +1,4 @@
-name: 'Doctor'
+name: 'KleeneAIDoctor'
 description: 'sync your local docs to notion'
 inputs:
   token:
