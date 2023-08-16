@@ -10,6 +10,9 @@ jack-in with your preferred editor, for emacs it's:
 
 `cljs-jack-in` then select `shadow` then `app`
 
-## Release
+## Build and release
 
-`npx shadow-cljs release app`
+```shell
+npm i --include=dev
+npm run release
+```

@@ -8,5 +8,8 @@
   "dependencies": {
     "@actions/core": "^1.8.2",
     "@tryfabric/martian": "^1.2.0"
+  },
+  "scripts": {
+    "release": "shadow-cljs release app"
   }
 }
