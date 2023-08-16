@@ -14,7 +14,7 @@ inputs:
   doc-path:
     description: 'path to the doc folder you want to sync, from the root of the project'
     required: true
-    defualt: 'docs'
+    default: 'docs'
 runs:
   using: 'node16'
   main: 'target/kleene_ai-doctor.js'
